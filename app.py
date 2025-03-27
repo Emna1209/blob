@@ -11,3 +11,6 @@ if isPrime:
     print("Behy he4a primaire")
 else:
     print("Tet9ou7eb, mosh primaire he4a")
+
+
+# Waa winkom
