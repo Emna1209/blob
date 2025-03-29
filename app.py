@@ -1,16 +1,41 @@
-print("A3ti zebbi ra9m")
-n = int(input())
+import random
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 
-isPrime = True
+def rollDice():
+    roll = random.randint(1,100)
+    if roll == 100:
+        return False
+    elif roll <=50:
+        return False
+    elif 100 > roll > 50:
+        return True    
 
-for i in range(2,n):
-    if n%i == 0:
-        isPrime = False
+def simple_bettor(funds, initial_wager, wager_count):
 
-if isPrime:
-    print("Behy he4a primaire")
-else:
-    print("Tet9ou7eb, mosh primaire he4a")
+    value = funds
+    wager = initial_wager
+    wX = []
+    vY = []
+    currentWager = 1
+    while(currentWager <= wager_count):
+        if rollDice():
+            value += wager
+        else:
+            value -= wager
+        wX.append(currentWager)
+        vY.append(value)
+        currentWager += 1
+    if value < 0:
+        value = 'broke'
+    plt.plot(wX,vY)
 
+x = 0
+while x<1000:
+    simple_bettor(10000, 100, 100000)
+    x += 1
 
-# Waa winkom
+plt.ylabel('Account Value')
+plt.xlabel('Wager Count')
+plt.show()
