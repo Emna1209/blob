@@ -22,12 +22,12 @@ def simulate_profitability(net_income, n_years=5, n_simulations=1000):
 
 
 
-def main():
+def main(): 
     df = pd.read_excel("data/mockup_data.xlsx")
     companies = df["Nom PME"].unique().tolist()
 
     print("Bienvenue dans le simulateur de rentabilité")
-    print("1 - Voir croissance d'un seul PME")
+    print("1 - Voir croissance d'une seule PME")
     print("2 - Comparaison de toutes les PME")
     print("3 - Voir impact sur BIAT")
     mode = input("Choisissez une option (1, 2 ou 3) : ").strip()
