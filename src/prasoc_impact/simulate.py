@@ -17,6 +17,6 @@ def run_prasoc_simulations(df, loan_amount, interest_rate, years):
                 "profit_path": path,
                 "repayment_path": repayment_path,
                 "total_repaid": sum(repayment_path),
-                "defaulted": sum(repayment_path) < loan_amount * 0.6  # arbitrary threshold
+                "defaulted": sum(repayment_path) < loan_amount * 0.6
             })
     return results

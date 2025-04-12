@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 def plot_total_recovery(simulated_results, years):
     yearly_totals = [0] * years
@@ -34,5 +35,32 @@ def plot_repayment_distribution(simulated_results):
     plt.xlabel("Montant total remboursé par entreprise (TND)")
     plt.ylabel("Nombre d'observations")
     plt.grid(True, linestyle='--', alpha=0.6)
+    plt.tight_layout()
+    plt.show()
+
+def plot_profit_comparison(prasoc_profits, classic_profits):
+    import numpy as np
+    prasoc_avg = np.mean(prasoc_profits, axis=0)
+    classic_avg = np.mean(classic_profits, axis=0)
+    x = range(1, len(prasoc_avg) + 1)
+
+    plt.plot(x, prasoc_avg, label="PRASOC", color="green")
+    plt.plot(x, classic_avg, label="Classique", color="orange")
+    plt.title("Évolution moyenne des bénéfices")
+    plt.xlabel("Années")
+    plt.ylabel("Bénéfice annuel (TND)")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+def plot_biat_repayment_comparison(prasoc_repayments, classic_repayments):
+    prasoc_sum = np.sum(prasoc_repayments, axis=1)
+    classic_sum = np.sum(classic_repayments, axis=1)
+
+    plt.boxplot([prasoc_sum, classic_sum], labels=["PRASOC", "Classique"])
+    plt.title("Montant total remboursé à BIAT")
+    plt.ylabel("TND")
+    plt.grid(True)
     plt.tight_layout()
     plt.show()

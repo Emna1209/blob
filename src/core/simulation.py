@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from .config import YEARS, GRACE_PRASOC
+from .config import YEARS
 
 def simulate_profit_growth(start_profit, years=YEARS, growth_range=(0.03, 0.12)):
     path = []

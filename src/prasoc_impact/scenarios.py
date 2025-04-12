@@ -1,7 +1,5 @@
 from core.repayment import simulate_repayment
 
-# Alternative repayment simulation using tougher economic scenario
-
 def apply_stress_test(simulated_results, stress_factor=0.7):
     stressed = []
     for entry in simulated_results:
