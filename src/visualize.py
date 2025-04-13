@@ -110,3 +110,79 @@ def plot_group_comparison(stable_paths, risky_paths, stable_avg, risky_avg, year
 
     plt.tight_layout()
     plt.show()
+
+def plot_biat_repayment_analysis(yearly_totals: np.ndarray,
+                               loan_amount: float,
+                               interest_rate: float,
+                               n_pmes: int,
+                               default_rate: float):
+    """
+    Shows BIAT's expected repayment from PME portfolio
+    """
+    plt.figure(figsize=(14, 7))
+    
+    # Calculate metrics
+    total_loan = loan_amount * n_pmes
+    expected_return = yearly_totals.sum()
+    roi = (expected_return - total_loan) / total_loan
+    
+    # Create plot
+    years = range(1, len(yearly_totals) + 1)
+    plt.bar(years, yearly_totals, color='#1f77b4', alpha=0.7, label='Remboursements annuels')
+    
+    # Add reference lines
+    plt.axhline(y=total_loan, color='r', linestyle='--', label='Capital prêté')
+    plt.axhline(y=expected_return, color='g', linestyle=':', label='Total attendu')
+    
+    # Formatting
+    plt.title(
+        f"Projection BIAT - Portefeuille PME\n"
+        f"{n_pmes} PMEs × {loan_amount:,.0f} TND à {interest_rate*100:.1f}%\n"
+        f"ROI: {roi:.1%} | Défauts: {default_rate:.1%}",
+        fontsize=14, pad=20
+    )
+    plt.xlabel("Années")
+    plt.ylabel("Remboursements totaux (TND)")
+    plt.legend()
+    plt.grid(True, axis='y', alpha=0.3)
+    
+    # Add table with key metrics
+    metrics = [
+        ["Capital prêté", f"{total_loan:,.0f} TND"],
+        ["Total attendu", f"{expected_return:,.0f} TND"],
+        ["ROI projeté", f"{roi:.1%}"],
+        ["Taux de défaut", f"{default_rate:.1%}"],
+        ["Durée moyenne", f"{len(years)} ans"]
+    ]
+    
+    plt.table(
+        cellText=metrics,
+        colLabels=["Métrique", "Valeur"],
+        loc='bottom',
+        bbox=[0, -0.3, 1, 0.3]
+    )
+    
+    plt.tight_layout()
+    plt.subplots_adjust(bottom=0.3)
+    plt.show()
+
+def plot_repayment_distribution(repayment_paths: list[list[float]]):
+    """Show distribution of repayment outcomes"""
+    plt.figure(figsize=(12, 6))
+    
+    # Calculate statistics
+    final_repayments = [sum(path) for path in repayment_paths]
+    avg_repayment = np.mean(final_repayments)
+    
+    # Plot histogram
+    plt.hist(final_repayments, bins=30, color='skyblue', edgecolor='white', alpha=0.7)
+    plt.axvline(avg_repayment, color='red', linestyle='--', label=f'Moyenne: {avg_repayment:,.0f} TND')
+    
+    # Formatting
+    plt.title("Distribution des Remboursements Totaux par PME")
+    plt.xlabel("Montant total remboursé (TND)")
+    plt.ylabel("Nombre de PMEs")
+    plt.legend()
+    plt.grid(True, axis='y', alpha=0.3)
+    plt.tight_layout()
+    plt.show()
