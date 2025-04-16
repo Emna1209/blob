@@ -6,7 +6,7 @@ def generate_company_data(min_budget, max_budget, max_interest, max_grace, n=20)
 
     for i in range(n):
         # 1. Base budget (already owned)
-        base_budget = random.randint(min_budget, max_budget)
+        base_budget = int(random.randint(min_budget, max_budget) / 10)
 
         # 2. Loan amount, rounded to nearest 1,000
         raw_loan = random.randint(min_budget // 2, max_budget // 2)

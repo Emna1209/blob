@@ -2,13 +2,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-def plot_budget_evolution_from_csv(filepath):
+def plot_budget_evolution_from_csv(filepath, growth_rate=0.03):
     df = pd.read_csv(filepath)
 
-    # Extract initial budget (same across all rows)
-    initial_budget = df["Budget Initial"].iloc[0]
+    # Extract initial budget
+    initial_budget = df["Budget"].iloc[0]
 
-    # Calculate yearly remaining budget
+    # Track budget over time with growth
     budget_classic = []
     budget_prasoc = []
 
@@ -19,8 +19,8 @@ def plot_budget_evolution_from_csv(filepath):
         classic_payment = df.iloc[i]["Classic Total"]
         prasoc_payment = df.iloc[i]["PRASOC Total"]
 
-        current_classic -= classic_payment
-        current_prasoc -= prasoc_payment
+        current_classic = current_classic * (1 + growth_rate) - classic_payment
+        current_prasoc = current_prasoc * (1 + growth_rate) - prasoc_payment
 
         budget_classic.append(round(current_classic, 2))
         budget_prasoc.append(round(current_prasoc, 2))
@@ -32,7 +32,7 @@ def plot_budget_evolution_from_csv(filepath):
     plt.figure(figsize=(10, 5))
     plt.plot(years, budget_classic, label="Classique", marker='o', color='orange')
     plt.plot(years, budget_prasoc, label="PRASOC", marker='o', color='green')
-    plt.title(f"💰 Évolution du Budget - {name}")
+    plt.title(f"📈 Évolution du Budget avec Croissance – {name}")
     plt.xlabel("Année")
     plt.ylabel("Budget Restant (TND)")
     plt.grid(True, linestyle="--", alpha=0.5)

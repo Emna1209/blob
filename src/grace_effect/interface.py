@@ -14,21 +14,33 @@ def list_csv_files(folder):
 def option_generate_data():
     min_budget = int(input("💰 Budget minimum ? "))
     max_budget = int(input("💰 Budget maximum ? "))
-    max_interest = int(input("📈 Taux d’intérêt classique max (%) ? "))
-    max_grace = int(input("⏳ Durée de grâce PRASOC max (années) ? "))
+    max_interest = int(input("📈 Taux d’intérêt classique maximum (%) ? "))
+    max_grace = int(input("🕒 Durée de grâce PRASOC maximum (années) ? "))
 
     companies = generate_company_data(min_budget, max_budget, max_interest, max_grace)
 
     os.makedirs(DATA_FOLDER, exist_ok=True)
-    filename = f"generated_{len(os.listdir(DATA_FOLDER)) + 1}.csv"
-    filepath = os.path.join(DATA_FOLDER, filename)
+    output_path = os.path.join(DATA_FOLDER, "generated_pmes.csv")
 
-    with open(filepath, mode="w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=companies[0].keys())
+    with open(output_path, "w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=companies[0].keys())
         writer.writeheader()
         writer.writerows(companies)
 
-    print(f"\n✅ Données sauvegardées dans : {filepath}")
+    print("✅ Données générées et sauvegardées !")
+
+    # 🔍 Visualize the distribution of Montant Crédit
+    df = pd.read_csv(output_path)
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(8, 5))
+    plt.hist(df["Montant Crédit"], bins=10, color='skyblue', edgecolor='black')
+    plt.title("Distribution des Montants de Crédit des PMEs\n✅ Données générées avec succès !")
+    plt.xlabel("Montant Crédit (TND)")
+    plt.ylabel("Nombre de PMEs")
+    plt.grid(axis='y', alpha=0.4)
+    plt.tight_layout()
+    plt.show()
 
 def option_view_single_table():
     files = list_csv_files(DATA_FOLDER)
@@ -63,11 +75,9 @@ def option_view_single_table():
     os.remove("temp_selected_pme.csv")
 
 def option_plot_budget():
-    if not os.path.exists(REPAYMENT_FOLDER):
-        print("❌ Aucun dossier de remboursement trouvé.")
-        return
+    folder = "src/grace_effect/data/repayments"
+    files = [f for f in os.listdir(folder) if f.endswith(".csv")]
 
-    files = list_csv_files(REPAYMENT_FOLDER)
     if not files:
         print("❌ Aucun fichier de remboursement trouvé.")
         return
@@ -81,8 +91,11 @@ def option_plot_budget():
         print("❌ Choix invalide.")
         return
 
-    filepath = os.path.join(REPAYMENT_FOLDER, files[choice])
-    plot_budget_evolution_from_csv(filepath)
+    growth_input = input("📈 Taux de croissance naturel du budget (%) ? (défaut 3%) : ") or "3"
+    growth_rate = float(growth_input) / 100
+
+    filepath = os.path.join(folder, files[choice])
+    plot_budget_evolution_from_csv(filepath, growth_rate)
 
 def main():
     print("\n🎛️ Menu – Comparateur PRASOC vs Classique")
