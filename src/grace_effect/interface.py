@@ -1,37 +1,105 @@
 import os
 import pandas as pd
-from datetime import datetime
+import csv
 from data_generator import generate_company_data
+from tables import generate_financial_tables_from_file
+from budget_evolution import plot_budget_evolution_from_csv
 
-def main():
-    print("📊 Générateur de Données PME - Étude de Grâce PRASOC")
+DATA_FOLDER = "src/grace_effect/data"
+REPAYMENT_FOLDER = os.path.join(DATA_FOLDER, "repayments")
 
-    min_budget = int(input("💰 Budget minimum PME ? "))
-    max_budget = int(input("💰 Budget maximum PME ? "))
-    max_interest = float(input("📈 Taux d'intérêt classique max (%) ? "))
+def list_csv_files(folder):
+    return [f for f in os.listdir(folder) if f.endswith(".csv")]
+
+def option_generate_data():
+    min_budget = int(input("💰 Budget minimum ? "))
+    max_budget = int(input("💰 Budget maximum ? "))
+    max_interest = int(input("📈 Taux d’intérêt classique max (%) ? "))
     max_grace = int(input("⏳ Durée de grâce PRASOC max (années) ? "))
 
-    companies = generate_company_data(
-        min_budget=min_budget,
-        max_budget=max_budget,
-        max_interest=max_interest,
-        max_grace=max_grace,
-        n=20
-    )
+    companies = generate_company_data(min_budget, max_budget, max_interest, max_grace)
 
-    df = pd.DataFrame(companies)
+    os.makedirs(DATA_FOLDER, exist_ok=True)
+    filename = f"generated_{len(os.listdir(DATA_FOLDER)) + 1}.csv"
+    filepath = os.path.join(DATA_FOLDER, filename)
 
-    # Ensure the data folder exists
-    data_dir = os.path.join(os.path.dirname(__file__), "data")
-    os.makedirs(data_dir, exist_ok=True)
+    with open(filepath, mode="w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=companies[0].keys())
+        writer.writeheader()
+        writer.writerows(companies)
 
-    # Generate filename with timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_path = os.path.join(data_dir, f"companies_{timestamp}.csv")
+    print(f"\n✅ Données sauvegardées dans : {filepath}")
 
-    # Save the file
-    df.to_csv(file_path, index=False)
-    print(f"\n✅ {len(companies)} PME générées et sauvegardées dans : {file_path}")
+def option_view_single_table():
+    files = list_csv_files(DATA_FOLDER)
+    if not files:
+        print("❌ Aucun fichier trouvé dans le dossier data.")
+        return
+
+    print("\n📁 Fichiers disponibles :")
+    for idx, file in enumerate(files):
+        print(f"{idx+1}. {file}")
+
+    choice = int(input("Quel fichier voulez-vous utiliser ? ")) - 1
+    if choice < 0 or choice >= len(files):
+        print("❌ Choix invalide.")
+        return
+
+    filepath = os.path.join(DATA_FOLDER, files[choice])
+    df = pd.read_csv(filepath)
+
+    print("\n📌 PMEs disponibles :")
+    for idx, name in enumerate(df["Nom PME"]):
+        print(f"{idx+1}. {name}")
+
+    pme_choice = int(input("Choisissez la PME à visualiser : ")) - 1
+    if pme_choice < 0 or pme_choice >= len(df):
+        print("❌ Choix invalide.")
+        return
+
+    selected_row = df.iloc[[pme_choice]]
+    selected_row.to_csv("temp_selected_pme.csv", index=False)
+    generate_financial_tables_from_file("temp_selected_pme.csv")
+    os.remove("temp_selected_pme.csv")
+
+def option_plot_budget():
+    if not os.path.exists(REPAYMENT_FOLDER):
+        print("❌ Aucun dossier de remboursement trouvé.")
+        return
+
+    files = list_csv_files(REPAYMENT_FOLDER)
+    if not files:
+        print("❌ Aucun fichier de remboursement trouvé.")
+        return
+
+    print("\n📁 Fichiers de remboursement disponibles :")
+    for idx, file in enumerate(files):
+        print(f"{idx+1}. {file}")
+
+    choice = int(input("Quel fichier voulez-vous visualiser ? ")) - 1
+    if choice < 0 or choice >= len(files):
+        print("❌ Choix invalide.")
+        return
+
+    filepath = os.path.join(REPAYMENT_FOLDER, files[choice])
+    plot_budget_evolution_from_csv(filepath)
+
+def main():
+    print("\n🎛️ Menu – Comparateur PRASOC vs Classique")
+    print("1. 🎲 Générer des données de test")
+    print("2. 🧮 Afficher le tableau financier pour une PME")
+    print("3. 📈 Évolution du budget sous crédit (comparatif)")
+
+    option = input("\nVotre choix ? ")
+
+    if option == "1":
+        option_generate_data()
+    elif option == "2":
+        option_view_single_table()
+    elif option == "3":
+        option_plot_budget()
+    else:
+        print("❌ Option invalide.")
 
 if __name__ == "__main__":
     main()
