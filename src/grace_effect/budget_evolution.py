@@ -5,10 +5,10 @@ import os
 def plot_budget_evolution_from_csv(filepath, growth_rate=0.03):
     df = pd.read_csv(filepath)
 
-    # Extract initial budget
+    # Get initial budget
     initial_budget = df["Budget"].iloc[0]
 
-    # Track budget over time with growth
+    # Calculate year-by-year remaining budget
     budget_classic = []
     budget_prasoc = []
 
@@ -25,16 +25,15 @@ def plot_budget_evolution_from_csv(filepath, growth_rate=0.03):
         budget_classic.append(round(current_classic, 2))
         budget_prasoc.append(round(current_prasoc, 2))
 
-    # Plotting
     years = df["Year"]
     name = os.path.basename(filepath).replace("repayments_", "").replace(".csv", "")
 
     plt.figure(figsize=(10, 5))
-    plt.plot(years, budget_classic, label="Classique", marker='o', color='orange')
+    plt.plot(years, budget_classic, label="Classic", marker='o', color='orange')
     plt.plot(years, budget_prasoc, label="PRASOC", marker='o', color='green')
-    plt.title(f"📈 Évolution du Budget avec Croissance – {name}")
-    plt.xlabel("Année")
-    plt.ylabel("Budget Restant (TND)")
+    plt.title(f"📈 Budget Evolution – {name}")
+    plt.xlabel("Year")
+    plt.ylabel("Remaining Budget (TND)")
     plt.grid(True, linestyle="--", alpha=0.5)
     plt.legend()
     plt.tight_layout()
