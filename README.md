@@ -12,7 +12,7 @@ cd project
 pip install -r requirements.txt
 
 ```
-Right now there are three stable options:
+Right now there are four stable options:
 1-
 ./main.py
 This is useful to show the growth of a single PME, compare all PMEs, and see how they impact BIAT
@@ -22,6 +22,10 @@ Useful to calculate the ESG scores
 3-
 /loan_strategies/main.py
 Useful to show the advantage of a prosac loan over the classical loan
+4-
+/grace_effect/interface.py
+Useful to generate data and view how it works with loans, then map the evolution of budget
+
 
 --> loan_comparison, prasoc_impact are not useful right now
 --> no need to look at core
